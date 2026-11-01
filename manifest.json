@@ -1,0 +1,57 @@
+{
+  "version": "0.5.0",
+  "files": [
+    {
+      "path": "Start-RecyclePet.cmd",
+      "sha256": "2b28abb2909de695373881575582353ad4f5370f3cc624475801936131dad0e1"
+    },
+    {
+      "path": "Test-RecyclePet.cmd",
+      "sha256": "56000ef8c07e1065d1beb4189122a43fe50a80598d6539fdd293e5ed7fea2c65"
+    },
+    {
+      "path": "assets/frog.png",
+      "sha256": "950ca7163fe470a111a031f6ffee810818298fca88b27f3dae023e143eceeec8"
+    },
+    {
+      "path": "assets/maid-swallow.png",
+      "sha256": "70509a12bc361aa0a2bf12fcaa3a64192c127d08434d9931b43b2143ab1e6862"
+    },
+    {
+      "path": "assets/maid.png",
+      "sha256": "4485901a1c04f690486c42205d1d2760c4af49b17893e3197b190637f42c75e8"
+    },
+    {
+      "path": "assets/token.wav",
+      "sha256": "b0bfaefd5262aefc982363e16bf5b0a2a9d7bdb93f276afc5229497c707b4cff"
+    },
+    {
+      "path": "assets/voice.wav",
+      "sha256": "6ebc9d8e3ad6aadcb4c6ca73b02f08e0d9d04c132a72cbf6d213e5ebdd6ad8e0"
+    },
+    {
+      "path": "scripts/Runtime.ps1",
+      "sha256": "55d6f27ce59fea27ec3ec16d8b79e8e5b90aac30f8d506edaeb27fbac5106a98"
+    },
+    {
+      "path": "scripts/Start-RecyclePet.ps1",
+      "sha256": "10e6c25852ff4f0f7e9dcdf98167348c677c7eb26a1873aa1e6f3da0d3cb0874"
+    },
+    {
+      "path": "scripts/Test-RecyclePet.ps1",
+      "sha256": "2672f4d82621d56c8279e30c91fdca969fe48d8099ab7cac95c24e71ce97e6f7"
+    },
+    {
+      "path": "scripts/check_bundle.py",
+      "sha256": "dada1a52cad9058a29197f4412072fa3c4c8d6d26f3397958333b7a48a755e5b"
+    },
+    {
+      "path": "scripts/native/PetWindow.cs",
+      "sha256": "0a66a9c5cb10694e1452361a1adf09fc6a910a24a1bf85aaab5204f26d5c96da"
+    },
+    {
+      "path": "scripts/native/RecycleNative.cs",
+      "sha256": "4e880dadcc0ad7fc739f719a518f1e7e0870556a6d22502c3d9678fe9109130d"
+    }
+  ]
+}
