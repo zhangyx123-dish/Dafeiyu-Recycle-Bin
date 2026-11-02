@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using Microsoft.Win32.SafeHandles;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -52,14 +54,42 @@ namespace RecyclePet {
             foreach (Environment.SpecialFolder f in new [] {Environment.SpecialFolder.Windows, Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86})
                 if (Under(p, Environment.GetFolderPath(f))) throw new IOException("不处理 Windows 或程序安装目录里的文件。");
             if (Under(p, ProtectedRoot)) throw new IOException("不回收桌宠自身的程序和素材。");
-            if ((File.GetAttributes(p) & FileAttributes.System) != 0) throw new IOException("不处理系统文件。");
+            FileAttributes attributes = File.GetAttributes(p);
+            if ((attributes & FileAttributes.System) != 0) throw new IOException("不处理系统文件。");
+            // A cloud-managed Desktop is not necessarily a link. Inspect the tag,
+            // rather than rejecting every ReparsePoint on the ancestor chain.
+            if (!HasLocalData((uint)attributes)) throw new IOException("文件尚未完整保存在本机。请先右键选择‘始终保留在此设备上’，等下载完成后再拖入。");
             string ancestor = p;
             while (!String.IsNullOrEmpty(ancestor)) {
-                if ((File.GetAttributes(ancestor) & FileAttributes.ReparsePoint) != 0) throw new IOException("此版不处理链接、联接或云占位文件，请使用普通本地文件。");
+                if ((File.GetAttributes(ancestor) & FileAttributes.ReparsePoint) != 0) {
+                    uint tag = ReparseTag(ancestor);
+                    if (!IsCloudTag(tag)) throw new IOException("路径包含链接、联接或不支持的重解析点（0x" + tag.ToString("X8") + "）。请将普通文件放到非链接目录后再拖入。");
+                }
                 ancestor = Path.GetDirectoryName(ancestor);
             }
             return p;
         }
+        // Windows IO_REPARSE_TAG_CLOUD and CLOUD_1 ... CLOUD_F. These tags
+        // preserve path identity; mount points and symlinks remain rejected.
+        public static bool IsCloudTag(uint tag) { return (tag & 0xFFFF0FFFu) == 0x9000001Au; }
+        // OFFLINE, RECALL_ON_OPEN, RECALL_ON_DATA_ACCESS: do not trigger hydration.
+        public static bool HasLocalData(uint attributes) { return (attributes & (0x1000u | 0x40000u | 0x400000u)) == 0; }
+        static uint ReparseTag(string path) {
+            using (SafeFileHandle handle = CreateFileW(path, 0, 1 | 2 | 4, IntPtr.Zero, 3, 0x00200000 | 0x02000000, IntPtr.Zero)) {
+                if (handle.IsInvalid) throw new Win32Exception(Marshal.GetLastWin32Error(), "无法检查路径类型：" + path);
+                byte[] buffer = new byte[16384]; uint returned;
+                if (!DeviceIoControl(handle, 0x000900A8, IntPtr.Zero, 0, buffer, (uint)buffer.Length, out returned, IntPtr.Zero))
+                    throw new Win32Exception(Marshal.GetLastWin32Error(), "无法读取路径类型：" + path);
+                if (returned < 8) throw new IOException("路径类型信息不完整。");
+                return BitConverter.ToUInt32(buffer, 0);
+            }
+        }
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true, ExactSpelling = true)]
+        static extern SafeFileHandle CreateFileW(string path, uint access, uint share, IntPtr security, uint creation, uint flags, IntPtr template);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool DeviceIoControl(SafeFileHandle handle, uint code, IntPtr input, uint inputSize, [Out] byte[] output, uint outputSize, out uint returned, IntPtr overlapped);
+
         static IShellItem Item(string path) {
             Guid iid = typeof(IShellItem).GUID; IShellItem item;
             int hr = SHCreateItemFromParsingName(path, IntPtr.Zero, ref iid, out item); Marshal.ThrowExceptionForHR(hr); return item;

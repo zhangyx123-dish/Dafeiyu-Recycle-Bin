@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.5.1",
   "files": [
     {
       "path": "Start-RecyclePet.cmd",
@@ -51,7 +51,7 @@
     },
     {
       "path": "scripts/native/RecycleNative.cs",
-      "sha256": "4e880dadcc0ad7fc739f719a518f1e7e0870556a6d22502c3d9678fe9109130d"
+      "sha256": "95466565b1033c000b6f9735777925442d141ae6a8303b69a69a37531eb468d2"
     }
   ]
 }
